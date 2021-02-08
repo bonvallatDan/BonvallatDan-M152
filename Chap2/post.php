@@ -6,15 +6,22 @@ function affichePost()
     $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
     $destination = "./local/stockage";
     addPost($msg);
+    //On envoie le message dans la BD
+
     $id = retournId();
+    //On stock l'id du message dans une variable
+
     $arr = $_FILES["lienImg"]["name"];
     for ($i = 0; $i < sizeof($arr); $i++) {
         addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
-        //move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . generer . ".txt");
+        //Pour chaque images, on envoie les données dans la base de donnée
+
+        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire() . ".txt");
+        //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
     }
 }
 
-function genererChaineAleatoire($longueur = 10)
+function genererChaineAleatoire($longueur = 5)
 {
  $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
  $longueurMax = strlen($caracteres);
@@ -28,9 +35,10 @@ function genererChaineAleatoire($longueur = 10)
 
 
 
-
 if (isset($_POST['envoie'])) {
     affichePost();
+    //Lorsqu'on appuie sur le bouton "envoyer"
+    //On applique la fonction affichePost
 }
 ?>
 
