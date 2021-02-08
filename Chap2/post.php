@@ -10,9 +10,24 @@ function affichePost()
     $arr = $_FILES["lienImg"]["name"];
     for ($i = 0; $i < sizeof($arr); $i++) {
         addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
-        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . $i . ".txt");
+        //move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . generer . ".txt");
     }
 }
+
+function genererChaineAleatoire($longueur = 10)
+{
+ $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+ $longueurMax = strlen($caracteres);
+ $chaineAleatoire = '';
+ for ($i = 0; $i < $longueur; $i++)
+ {
+ $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
+ }
+ return $chaineAleatoire;
+}
+
+
+
 
 if (isset($_POST['envoie'])) {
     affichePost();

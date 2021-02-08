@@ -4,7 +4,7 @@ require_once "database.php";
 function addPost($commentaire)
 {
   static $ps = null;
-  $sql = "INSERT INTO `db_m152`.`postes` (`commentaire`) ";
+  $sql = "INSERT INTO `db_m152`.`postes` (`comentaire`) ";
   $sql .= "VALUES (:COMMENTAIRE)";
   if ($ps == null) {
     $ps = db_m152()->prepare($sql);
@@ -52,7 +52,7 @@ function retournId()
 function addMedia($typeMedia, $nomMedia, $idPost)
 {
   static $ps = null;
-  $sql = "INSERT INTO `db_m152`.`postes` (`typeMedia`, `nomMedia`, `idPost`) ";
+  $sql = "INSERT INTO `db_m152`.`medias` (`typeMedia`, `nomMedia`, `idPost`) ";
   $sql .= "VALUES (:TYPE_MEDIA, :NOM_MEDIA, :ID_POST)";
   if ($ps == null) {
     $ps = db_m152()->prepare($sql);
@@ -61,7 +61,7 @@ function addMedia($typeMedia, $nomMedia, $idPost)
   try {
     $ps->bindParam(':TYPE_MEDIA', $typeMedia, PDO::PARAM_STR);
     $ps->bindParam(':NOM_MEDIA', $nomMedia, PDO::PARAM_STR);
-    $ps->bindParam(':ID_POST', $idPost, PDO::PARAM_STR);
+    $ps->bindParam(':ID_POST', $idPost, PDO::PARAM_INT);
 
     $answer = $ps->execute();
   } catch (PDOException $e) {
