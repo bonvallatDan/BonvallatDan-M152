@@ -4,9 +4,15 @@ require_once "php/function.php";
 function affichePost()
 {
     $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
+    $destination = "/local/stockage";
     addPost($msg);
     $id = retournId();
-    var_dump($id);
+    $arr = $_FILES["lienImg"]["name"];
+    for ($i=0; $i < sizeof($arr); $i++) { 
+        addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
+        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination.$i.".txt");
+    }
+
 }
 
 if (isset($_POST['envoie']))

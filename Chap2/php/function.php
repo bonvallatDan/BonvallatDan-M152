@@ -49,21 +49,19 @@ function retournId()
 
 
 
-function addMedia($branche, $date, $note, $remarque, $coefficient)
+function addMedia($typeMedia, $nomMedia, $idPost)
 {
   static $ps = null;
-  $sql = "INSERT INTO `db_m152`.`postes` (`branche`, `date`, `note`, `remarque`, `coefficient`) ";
-  $sql .= "VALUES (:BRANCHE, :DATE, round(:NOTE,2), :REMARQUE, :COEFFICIENT)";
+  $sql = "INSERT INTO `db_m152`.`postes` (`typeMedia`, `nomMedia`, `idPost`) ";
+  $sql .= "VALUES (:TYPE_MEDIA, :NOM_MEDIA, :ID_POST)";
   if ($ps == null) {
     $ps = db_m152()->prepare($sql);
   }
   $answer = false;
   try {
-    $ps->bindParam(':BRANCHE', $branche, PDO::PARAM_STR);
-    $ps->bindParam(':DATE', $date, PDO::PARAM_STR);
-    $ps->bindParam(':NOTE', $note, PDO::PARAM_STR);
-    $ps->bindParam(':REMARQUE', $remarque, PDO::PARAM_STR);
-    $ps->bindParam(':COEFFICIENT', $coefficient, PDO::PARAM_INT);
+    $ps->bindParam(':TYPE_MEDIA', $typeMedia, PDO::PARAM_STR);
+    $ps->bindParam(':NOM_MEDIA', $nomMedia, PDO::PARAM_STR);
+    $ps->bindParam(':ID_POST', $idPost, PDO::PARAM_STR);
 
     $answer = $ps->execute();
   } catch (PDOException $e) {
