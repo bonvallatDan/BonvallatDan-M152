@@ -18,21 +18,37 @@ function affichePost()
 
     $arr = $_FILES["lienImg"]["name"];
     for ($i = 0; $i < sizeof($arr); $i++) {
-        $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
-        if ($pos === false)
-        {
-            break;
-        }
-        else
-        {
-            addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
-            //Pour chaque images, on envoie les données dans la base de donnée
-
-            move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
-            //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
-        }
+        verifType($i, $destination, $id);
     }
 }
+
+
+
+function verifType($i, $destination, $id)
+{
+    $type = "image";
+    $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
+    if ($pos === false) {
+        return;
+    } else {
+        verifSize($i, $destination, $id);
+    }
+}
+
+function verifSize($i, $destination, $id)
+{
+    $sizeImg = 70000;
+    while ($_FILES["lienImg"]["size"][$i] <= $sizeImg)
+    {
+        addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
+        //Pour chaque images, on envoie les données dans la base de donnée
+    
+        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
+        //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
+    }
+    
+}
+
 
 function genererChaineAleatoire($longueur = 5)
 {
