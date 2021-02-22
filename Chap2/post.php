@@ -1,8 +1,13 @@
 <?php
 require_once "php/function.php";
 
+
+
+
+
 function affichePost()
 {
+    $type = "image";
     $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
     $destination = "./local/stockage";
     addPost($msg);
@@ -13,24 +18,31 @@ function affichePost()
 
     $arr = $_FILES["lienImg"]["name"];
     for ($i = 0; $i < sizeof($arr); $i++) {
-        addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
-        //Pour chaque images, on envoie les données dans la base de donnée
+        $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
+        if ($pos === false)
+        {
+            break;
+        }
+        else
+        {
+            addMedia($_FILES["lienImg"]["type"][$i], $_FILES["lienImg"]["name"][$i], $id[0]["idPost"]);
+            //Pour chaque images, on envoie les données dans la base de donnée
 
-        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire() . ".txt");
-        //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
+            move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
+            //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
+        }
     }
 }
 
 function genererChaineAleatoire($longueur = 5)
 {
- $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
- $longueurMax = strlen($caracteres);
- $chaineAleatoire = '';
- for ($i = 0; $i < $longueur; $i++)
- {
- $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
- }
- return $chaineAleatoire;
+    $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $longueurMax = strlen($caracteres);
+    $chaineAleatoire = '';
+    for ($i = 0; $i < $longueur; $i++) {
+        $chaineAleatoire .= $caracteres[rand(0, $longueurMax - 1)];
+    }
+    return $chaineAleatoire;
 }
 
 
