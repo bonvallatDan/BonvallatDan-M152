@@ -9,7 +9,7 @@ function affichePost()
 {
     $type = "image";
     $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
-    $destination = "../local/stockage";
+    $destination = "./local/stockage";
     addPost($msg);
     //On envoie le message dans la BD
 
@@ -43,30 +43,26 @@ function verifSize($i, $destination, $id)
     $sizeImgTot = 0;
     $sizeImgMax = 3000000;
 
-    for ($i=0; $i < sizeof($_FILES["lienImg"]["name"]); $i++) {
-        if ($_FILES["lienImg"]["size"][$i] < $sizeImgMax)
-        {
+    for ($i = 0; $i < sizeof($_FILES["lienImg"]["name"]); $i++) {
+        if ($_FILES["lienImg"]["size"][$i] < $sizeImgMax) {
             $sizeImgTot += $_FILES["lienImg"]["size"][$i];
             //verifie que l'image est plus petite que 3'000'000
             //si image plus petite alors stock la taille dans variable
-        } 
-        else
-        {
+        } else {
             break;
         }
     }
-    if ($sizeImgTot > $sizeImgMaxTot)
-    {
+    if ($sizeImgTot > $sizeImgMaxTot) {
         return;
-    }
-    else
-    {
-        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
-        //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
+    } else {
+        for ($i = 0; $i < sizeof($_FILES["lienImg"]["name"]); $i++) {
+            move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
+            //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
 
-        addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire(), $id[0]["idPost"]);
-        //Pour chaque images, on envoie les données dans la base de donnée
-    }    
+            addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire(), $id[0]["idPost"]);
+            //Pour chaque images, on envoie les données dans la base de donnée
+        }
+    }
 }
 
 
