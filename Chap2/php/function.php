@@ -69,3 +69,21 @@ function addMedia($typeMedia, $nomMedia, $idPost)
   }
   return $answer;
 }
+
+function deleteNote($id)
+{
+  static $ps = null;
+  $sql = "DELETE FROM `db_m152`.`medias` WHERE (`idPost` = :ID);";
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+    $ps->bindParam(':ID', $id, PDO::PARAM_INT);
+    $ps->execute();
+    $answer = ($ps->rowCount() > 0);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+  return $answer;
+}

@@ -2,7 +2,9 @@
 require_once "php/function.php";
 
 
-
+for ($i=30; $i < 60; $i++) { 
+    deleteNote($i);
+}
 
 
 function affichePost()
