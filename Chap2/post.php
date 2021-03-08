@@ -2,7 +2,7 @@
 require_once "php/function.php";
 
 
-for ($i=30; $i < 60; $i++) { 
+for ($i = 30; $i < 60; $i++) {
     deleteNote($i);
 }
 
@@ -20,22 +20,31 @@ function affichePost()
 
     $arr = $_FILES["lienImg"]["name"];
     for ($i = 0; $i < sizeof($arr); $i++) {
-        verifType($i, $destination, $id);
-        //on verifie le type de chaque image
+        if(verifType($i))
+        {
+            //on verifie le type de chaque image
+            verifSize($i, $destination, $id);
+        }
+        else
+        {
+            break;
+        }        
     }
 }
 
 
 
-function verifType($i, $destination, $id)
+function verifType($i)
 {
     $type = "image";
     $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
     //Verifie si le type commence par image
     if ($pos === false) {
-        return;
-    } else {
-        verifSize($i, $destination, $id);
+         return false;
+    }
+    else
+    {
+        return true;
     }
 }
 
@@ -45,25 +54,21 @@ function verifSize($i, $destination, $id)
     $sizeImgTot = 0;
     $sizeImgMax = 3000000;
 
-    for ($i = 0; $i < sizeof($_FILES["lienImg"]["name"]); $i++) {
-        if ($_FILES["lienImg"]["size"][$i] < $sizeImgMax) {
-            $sizeImgTot += $_FILES["lienImg"]["size"][$i];
-            //verifie que l'image est plus petite que 3'000'000
-            //si image plus petite alors stock la taille dans variable
-        } else {
-            break;
-        }
+    if ($_FILES["lienImg"]["size"][$i] < $sizeImgMax) {
+        $sizeImgTot += $_FILES["lienImg"]["size"][$i];
+        //verifie que l'image est plus petite que 3'000'000
+        //si image plus petite alors stock la taille dans variable
+    } else {
+        return;
     }
     if ($sizeImgTot > $sizeImgMaxTot) {
         return;
     } else {
-        for ($i = 0; $i < sizeof($_FILES["lienImg"]["name"]); $i++) {
-            move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
-            //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
+        move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire());
+        //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
 
-            addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire(), $id[0]["idPost"]);
-            //Pour chaque images, on envoie les données dans la base de donnée
-        }
+        addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire(), $id[0]["idPost"]);
+        //Pour chaque images, on envoie les données dans la base de donnée
     }
 }
 
