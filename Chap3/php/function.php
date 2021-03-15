@@ -36,7 +36,7 @@ function retournId()
   try {
 
     if ($ps->execute())
-      $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+      $answer = $ps->fetch(PDO::FETCH_ASSOC);
   } catch (PDOException $e) {
     echo $e->getMessage();
   }
@@ -56,7 +56,7 @@ function genererChaineAleatoire($longueur = 5)
   return $chaineAleatoire;
 }
 
-function affichePost()
+function insertPost()
 {
   $type = "image";
   $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
@@ -72,11 +72,10 @@ function affichePost()
     if (verifType($i)) {
       //on verifie le type de chaque image
       if (verifSize($i, $destination, $idPost)) {
-        $bob = recupNomImg($idPost);
-        header('Location: index.php');
-        echo "<img src=local/$bob>";
-      } else {
         break;
+      } else {
+        $reucpNomImg = recupNomImg($idPost);
+        header('Location: index.php');
       }
     } else {
       break;
@@ -92,7 +91,7 @@ function recupNomImg($idPost)
   $sql .= ' WHERE idPost = :IDPOST';
 
   if ($ps == null) {
-    $ps = dbnotes()->prepare($sql);
+    $ps = db_m152()->prepare($sql);
   }
   $answer = false;
   try {
@@ -163,7 +162,58 @@ function verifSize($i, $destination, $id)
     move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire() . $extension["dirname"] . $extension["extension"]);
     //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
 
-    addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire() . $extension["dirname"] . $extension["extension"], $id[0]["idPost"]);
+    addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire() . $extension["dirname"] . $extension["extension"], $id["idPost"]);
     //Pour chaque images, on envoie les données dans la base de donnée
   }
+}
+
+
+function displayPost()
+{
+  
+}
+
+
+function recupMedia($idPost)
+{
+  static $ps = null;
+  $sql = 'SELECT idMedia, typeMedia, nomMedia, creationDate, idPost FROM db_m152.medias';
+  $sql .= ' WHERE idPost = :IDPOST';
+
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+    $ps->bindParam(':IDPOST', $idPost['idPost'], PDO::PARAM_INT);
+
+    if ($ps->execute())
+      $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+
+  return $answer;
+}
+
+function recupPost($idPost)
+{
+  static $ps = null;
+  $sql = 'SELECT idPost, comentaire, creationDate, modificationDate FROM db_m152.postes';
+  $sql .= ' WHERE idPost = :IDPOST';
+
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+    $ps->bindParam(':IDPOST', $idPost['idPost'], PDO::PARAM_INT);
+
+    if ($ps->execute())
+      $answer = $ps->fetch(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+
+  return $answer;
 }

@@ -1,4 +1,9 @@
+<?php 
+include_once('php/function.php');
 
+$scu = recupPost(retournId());
+$bob = recupMedia(retournId());
+?>
 <!doctype html>
 <html lang="en">
   <head>
