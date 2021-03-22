@@ -1,5 +1,6 @@
 <?php
 require_once "database.php";
+session_start();
 
 function addPost($commentaire)
 {
@@ -28,6 +29,47 @@ function retournId()
 {
   static $ps = null;
   $sql = 'SELECT `idPost` FROM `db_m152`.`postes` ORDER BY `idPost` DESC LIMIT 1';
+
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+
+    if ($ps->execute())
+      $answer = $ps->fetch(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+
+  return $answer;
+}
+
+
+function retournPost()
+{
+  static $ps = null;
+  $sql = 'SELECT idPost, comentaire, creationDate, modificationDate FROM postes';
+
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+
+    if ($ps->execute())
+      $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+
+  return $answer;
+}
+
+function retournMedia()
+{
+  static $ps = null;
+  $sql = 'SELECT postes.idPost, medias.idMedia, medias.typeMedia, medias.nomMedia, medias.creationDate FROM postes INNER JOIN medias ON postes.idPost = medias.idPost ';
 
   if ($ps == null) {
     $ps = db_m152()->prepare($sql);
@@ -78,7 +120,8 @@ function insertPost()
         header('Location: index.php');
       }
     } else {
-      break;
+      $reucpNomImg = recupNomImg($idPost);
+      header('Location: index.php');
     }
   }
 }
@@ -170,7 +213,33 @@ function verifSize($i, $destination, $id)
 
 function displayPost()
 {
-  
+  $post = retournPost();
+  foreach ($post as $onePost) {
+    echo "<div class=row mb-2>
+      <div class=col-md-6>
+        <div class=row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative>
+          <div class=col p-4 d-flex flex-column position-static>";
+    $media = retournMedia();
+    if ($media) {
+      echo "<img src=./local/stockage". $media["nomMedia"] . "alt=ResponsiveImage class=img-thumbnail>";
+    }
+    echo "<span>" . $onePost["comentaire"] . "</span>
+          </div>
+        </div>
+      </div>
+    </div>";
+  }
+
+  /**<div class="row mb-2">
+      <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="col p-4 d-flex flex-column position-static">
+            <img src="./local/stockage1VV8w.jpg" alt="bob" class="img-thumbnail">
+            <span>Yo les tulipes c'est diabloX9</span>
+          </div>
+        </div>
+      </div>
+    </div>*/
 }
 
 
