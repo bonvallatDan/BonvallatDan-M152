@@ -103,7 +103,6 @@ function genererChaineAleatoire($longueur = 5)
 
 function insertPost()
 {
-  $type = "image";
   $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
   $destination = "./local/stockage";
   addPost($msg);
@@ -114,7 +113,8 @@ function insertPost()
 
   $arr = $_FILES["lienImg"]["name"];
   for ($i = 0; $i < sizeof($arr); $i++) {
-    if (verifType($i)) {
+    $type = $_FILES["lienImg"]["type"];
+    if (verifType($type)) {
       //on verifie le type de chaque image
       if (verifSize($i, $destination, $idPost)) {
         break;
@@ -176,18 +176,18 @@ function addMedia($typeMedia, $nomMedia, $idPost)
 
 
 
-function verifType($i)
+function verifType($type)
 {
-  $type = ["image", "video", "audio"];
-  switch ($type[0]) {
+  $i = ["image", "video", "audio"];
+  switch ($i) {
     case 'image':
-      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[0]);
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $i[0]);
       break;
     case "video":
-      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[1]);
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $i[1]);
       break;
     case "audio":
-      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[2]);
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $i[2]);
       break;
   }
 
@@ -240,6 +240,7 @@ function displayPost()
     $media = retournMedia($onePost["idPost"]);
     if ($media) {
       for ($i = 0; $i < count($media); $i++) {
+      
         echo "<img src=./local/stockage" . $media[$i]["nomMedia"] . " alt=ResponsiveImage class=img-thumbnail>";
       }
     }
