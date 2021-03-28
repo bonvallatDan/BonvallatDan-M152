@@ -75,8 +75,6 @@ include_once('php/function.php');
       </div>
     </div>
 
-    
-
 
     <?php
     displayPost();
