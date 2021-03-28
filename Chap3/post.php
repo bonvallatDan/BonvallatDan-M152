@@ -5,7 +5,7 @@ require_once "php/function.php";
 if (isset($_POST['envoie'])) {
     insertPost();
     //Lorsqu'on appuie sur le bouton "envoyer"
-    //On applique la fonction affichePost
+    //On applique la fonction insertPost
 }
 ?>
 
@@ -26,7 +26,7 @@ if (isset($_POST['envoie'])) {
     <form method="POST" enctype="multipart/form-data" action="#">
         <textarea placeholder="Ajouter un commentaire" style="resize:none;" rows="5" cols="55" name="commentaire" required></textarea><br>
         <label>Choisir une image</label>
-        <input type="file" multiple id="takeImage" accept="image/*" name="lienImg[]"><br>
+        <input type="file" multiple id="takeImage" accept="image/*, video/*, audio/*" name="lienImg[]"><br>
         <input type="submit" value="Envoyer" name="envoie">
     </form>
 

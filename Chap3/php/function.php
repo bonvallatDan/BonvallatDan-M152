@@ -178,8 +178,19 @@ function addMedia($typeMedia, $nomMedia, $idPost)
 
 function verifType($i)
 {
-  $type = "image";
-  $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
+  $type = ["image", "video", "audio"];
+  switch ($type[0]) {
+    case 'image':
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[0]);
+      break;
+    case "video":
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[1]);
+      break;
+    case "audio":
+      $pos = strpos($_FILES["lienImg"]["type"][$i], $type[2]);
+      break;
+  }
+
   //Verifie si le type commence par image
   if ($pos === false) {
     return false;
