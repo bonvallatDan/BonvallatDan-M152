@@ -66,25 +66,28 @@ function retournPost()
   return $answer;
 }
 
-function retournMedia()
+function retournMedia($idPost)
 {
   static $ps = null;
-  $sql = 'SELECT postes.idPost, medias.idMedia, medias.typeMedia, medias.nomMedia, medias.creationDate FROM postes INNER JOIN medias ON postes.idPost = medias.idPost ';
+  $sql = 'SELECT postes.idPost, medias.idMedia, medias.typeMedia, medias.nomMedia, medias.creationDate FROM postes INNER JOIN medias ON postes.idPost = medias.idPost WHERE postes.idPost = :IDPOST';
 
   if ($ps == null) {
     $ps = db_m152()->prepare($sql);
   }
   $answer = false;
   try {
-
+    $ps->bindParam(':IDPOST', $idPost, PDO::PARAM_INT);
     if ($ps->execute())
-      $answer = $ps->fetch(PDO::FETCH_ASSOC);
+      $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
   } catch (PDOException $e) {
     echo $e->getMessage();
   }
 
   return $answer;
 }
+
+
+
 
 function genererChaineAleatoire($longueur = 5)
 {
@@ -100,7 +103,7 @@ function genererChaineAleatoire($longueur = 5)
 
 function insertPost()
 {
-  $type = "image";
+  $bool = false;
   $msg = filter_input(INPUT_POST, 'commentaire', FILTER_SANITIZE_STRING);
   $destination = "./local/stockage";
   addPost($msg);
@@ -111,19 +114,21 @@ function insertPost()
 
   $arr = $_FILES["lienImg"]["name"];
   for ($i = 0; $i < sizeof($arr); $i++) {
-    if (verifType($i)) {
+    $type = $_FILES["lienImg"]["type"];
+    if (verifType($type)) {
       //on verifie le type de chaque image
       if (verifSize($i, $destination, $idPost)) {
         break;
       } else {
-        $reucpNomImg = recupNomImg($idPost);
         header('Location: index.php');
+        $bool = true;
       }
     } else {
-      $reucpNomImg = recupNomImg($idPost);
       header('Location: index.php');
+      $bool = false;
     }
   }
+  return $bool;
 }
 
 
@@ -173,16 +178,17 @@ function addMedia($typeMedia, $nomMedia, $idPost)
 
 
 
-function verifType($i)
+function verifType($type)
 {
-  $type = "image";
-  $pos = strpos($_FILES["lienImg"]["type"][$i], $type);
-  //Verifie si le type commence par image
-  if ($pos === false) {
-    return false;
-  } else {
-    return true;
+  $tabType = array("image", "video", "audio");
+
+  //Verifie si le type commence par image, video ou audio
+  for ($i = 0; $i < count($tabType); $i++) {
+    if (strpos($type[0], $tabType[$i])) {
+      return true;
+    } 
   }
+  return false;
 }
 
 function verifSize($i, $destination, $id)
@@ -202,10 +208,14 @@ function verifSize($i, $destination, $id)
   if ($sizeImgTot > $sizeImgMaxTot) {
     return;
   } else {
-    move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . genererChaineAleatoire() . $extension["dirname"] . $extension["extension"]);
+    $image = genererChaineAleatoire() . $extension["dirname"] . $extension["extension"];
+    if (move_uploaded_file($_FILES["lienImg"]["tmp_name"][$i], $destination . $image)) {
+      addMedia($_FILES["lienImg"]["type"][$i], $image, $id["idPost"]);
+    }
+
+
     //Les images selectionnez sont envoyées dans un dossier local ou un fichier unique est crée
 
-    addMedia($_FILES["lienImg"]["type"][$i], genererChaineAleatoire() . $extension["dirname"] . $extension["extension"], $id["idPost"]);
     //Pour chaque images, on envoie les données dans la base de donnée
   }
 }
@@ -213,23 +223,50 @@ function verifSize($i, $destination, $id)
 
 function displayPost()
 {
+  $tabType = ["image", "video", "audio"];
+  $bool = false;
   $post = retournPost();
   foreach ($post as $onePost) {
     echo "<div class=row mb-2>
       <div class=col-md-6>
         <div class=row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative>
           <div class=col p-4 d-flex flex-column position-static>";
-    $media = retournMedia();
+    $media = retournMedia($onePost["idPost"]);
+
     if ($media) {
-      echo "<img src=./local/stockage". $media["nomMedia"] . "alt=ResponsiveImage class=img-thumbnail>";
+      for ($i = 0; $i < count($media); $i++) {
+        if (strpos($media[$i]["typeMedia"], $tabType[0])) 
+        {
+          echo "<img src=./local/stockage" . $media[$i]["nomMedia"] . " alt=ResponsiveImage class=img-thumbnail>";
+        }
+        else if (strpos($media[$i]["typeMedia"], $tabType[1])) 
+        {
+            echo "<video height=200 width=200 autoplay muted><source src=./local/stockage" . $media[$i]["nomMedia"] . "></video>";
+        } 
+        else if (strpos($media[$i]["typeMedia"], $tabType[2])) 
+        {
+            echo "<audio controls><source src=./local/stockage" . $media[$i]["nomMedia"] . "></audio>";
+        } 
+        else 
+        {
+          return $bool;
+        }
+      }
+      if (strpos($media["typeMedia"], $tabType[0])) {
+        for ($i = 0; $i < count($media); $i++) {
+
+          echo "<img src=./local/stockage" . $media[$i]["nomMedia"] . " alt=ResponsiveImage class=img-thumbnail>";
+        }
+      } 
     }
     echo "<span>" . $onePost["comentaire"] . "</span>
           </div>
         </div>
       </div>
     </div>";
+    $bool = true;
   }
-
+  return $bool;
   /**<div class="row mb-2">
       <div class="col-md-6">
         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
@@ -285,4 +322,20 @@ function recupPost($idPost)
   }
 
   return $answer;
+}
+
+
+function startTansaction()
+{
+  db_m152()->beginTransaction();
+}
+
+function commit()
+{
+  db_m152()->commit();
+}
+
+function stopTransaction()
+{
+  db_m152()->rollBack();
 }

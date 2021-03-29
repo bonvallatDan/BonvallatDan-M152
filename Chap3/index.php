@@ -75,11 +75,17 @@ include_once('php/function.php');
       </div>
     </div>
 
-    
-
 
     <?php
-    displayPost();
+    startTansaction();
+    if (displayPost())
+    {
+      commit();
+    }
+    else
+    {
+      stopTransaction();
+    }
     ?>
   </main><!-- /.container -->
 
