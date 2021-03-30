@@ -184,7 +184,7 @@ function verifType($type)
 
   //Verifie si le type commence par image, video ou audio
   for ($i = 0; $i < count($tabType); $i++) {
-    if (strpos($type[0], $tabType[$i])) {
+    if (strpos($type[0], $tabType[$i]) === 0) {
       return true;
     } 
   }
@@ -195,7 +195,7 @@ function verifSize($i, $destination, $id)
 {
   $sizeImgMaxTot = 70000000;
   $sizeImgTot = 0;
-  $sizeImgMax = 3000000;
+  $sizeImgMax = 30000000;
   $extension = pathinfo($_FILES["lienImg"]["name"][$i]);
 
   if ($_FILES["lienImg"]["size"][$i] < $sizeImgMax) {
@@ -235,15 +235,15 @@ function displayPost()
 
     if ($media) {
       for ($i = 0; $i < count($media); $i++) {
-        if (strpos($media[$i]["typeMedia"], $tabType[0])) 
+        if (strpos($media[$i]["typeMedia"], $tabType[0]) === 0) 
         {
           echo "<img src=./local/stockage" . $media[$i]["nomMedia"] . " alt=ResponsiveImage class=img-thumbnail>";
         }
-        else if (strpos($media[$i]["typeMedia"], $tabType[1])) 
+        else if (strpos($media[$i]["typeMedia"], $tabType[1]) === 0) 
         {
-            echo "<video height=200 width=200 autoplay muted><source src=./local/stockage" . $media[$i]["nomMedia"] . "></video>";
+            echo "<video height=200 width=200 autoplay muted loop><source src=./local/stockage" . $media[$i]["nomMedia"] . "></video>";
         } 
-        else if (strpos($media[$i]["typeMedia"], $tabType[2])) 
+        else if (strpos($media[$i]["typeMedia"], $tabType[2]) === 0) 
         {
             echo "<audio controls><source src=./local/stockage" . $media[$i]["nomMedia"] . "></audio>";
         } 
@@ -252,12 +252,6 @@ function displayPost()
           return $bool;
         }
       }
-      if (strpos($media["typeMedia"], $tabType[0])) {
-        for ($i = 0; $i < count($media); $i++) {
-
-          echo "<img src=./local/stockage" . $media[$i]["nomMedia"] . " alt=ResponsiveImage class=img-thumbnail>";
-        }
-      } 
     }
     echo "<span>" . $onePost["comentaire"] . "</span>
           </div>
@@ -267,16 +261,6 @@ function displayPost()
     $bool = true;
   }
   return $bool;
-  /**<div class="row mb-2">
-      <div class="col-md-6">
-        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-          <div class="col p-4 d-flex flex-column position-static">
-            <img src="./local/stockage1VV8w.jpg" alt="bob" class="img-thumbnail">
-            <span>Yo les tulipes c'est diabloX9</span>
-          </div>
-        </div>
-      </div>
-    </div>*/
 }
 
 
