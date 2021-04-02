@@ -254,6 +254,8 @@ function displayPost()
       }
     }
     echo "<span>" . $onePost["comentaire"] . "</span>
+    <a href=./supprimer.php?idPost=".$onePost["idPost"].">Supprimer</a>
+    <a href./modifier.php?idPost=".$onePost["idPost"].">Modifier</a>
           </div>
         </div>
       </div>
@@ -322,4 +324,41 @@ function commit()
 function stopTransaction()
 {
   db_m152()->rollBack();
+}
+
+
+function deleteMedia($idPost)
+{
+  static $ps = null;
+  $sql = "DELETE FROM medias WHERE (`idPost` = :IDPOST);";
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+    $ps->bindParam(':IDPOST', $idPost, PDO::PARAM_INT);
+    $ps->execute();
+    $answer = ($ps->rowCount() > 0);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+  return $answer;
+}
+
+function deletePost($idPost)
+{
+  static $ps = null;
+  $sql = "DELETE FROM postes WHERE (`idPost` = :IDPOST);";
+  if ($ps == null) {
+    $ps = db_m152()->prepare($sql);
+  }
+  $answer = false;
+  try {
+    $ps->bindParam(':IDPOST', $idPost, PDO::PARAM_INT);
+    $ps->execute();
+    $answer = ($ps->rowCount() > 0);
+  } catch (PDOException $e) {
+    echo $e->getMessage();
+  }
+  return $answer;
 }
